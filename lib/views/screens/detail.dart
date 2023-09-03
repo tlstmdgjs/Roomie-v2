@@ -13,7 +13,7 @@ import 'package:social_app_ui/views/widgets/custom_text_field.dart';
 import 'package:social_app_ui/util/extensions.dart';
 
 class Detail extends StatefulWidget {
-  late final User user;
+  late final RoomieUser user;
   final Owner detailMode;
   Detail({
     required this.user,

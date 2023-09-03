@@ -3,7 +3,7 @@ import 'package:social_app_ui/util/user.dart';
 import 'package:social_app_ui/views/screens/detail.dart';
 
 class OtherProfile extends StatelessWidget {
-  final User user;
+  final RoomieUser user;
   OtherProfile({
     super.key,
     required this.user,

@@ -7,7 +7,7 @@ import 'package:social_app_ui/util/user.dart';
 
 class CustomGroupButton extends StatefulWidget {
   late final String hintText, surveyMode;
-  late final User user;
+  late final RoomieUser user;
   final bool disabled;
   CustomGroupButton({
     super.key,

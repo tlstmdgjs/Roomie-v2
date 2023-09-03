@@ -6,7 +6,7 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class CustomSfSlider extends StatefulWidget {
   late final String hintText, surveyMode;
-  late final User user;
+  late final RoomieUser user;
   final disabled;
   CustomSfSlider({
     super.key,

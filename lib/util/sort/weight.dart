@@ -18,7 +18,7 @@ double getWeight(double domain) {
 }
 
 List<ProfileCard> sort(
-    User user, List<ProfileCard> deck, Map<String, dynamic> weight) {
+    RoomieUser user, List<ProfileCard> deck, Map<String, dynamic> weight) {
   List<Pair<double, ProfileCard>> weightedDeck = [];
   for (var card in deck) {
     var score = user.getScore(card.user, weight);

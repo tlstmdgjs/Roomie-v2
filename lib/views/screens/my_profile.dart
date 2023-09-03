@@ -28,7 +28,7 @@ class MyProfile extends StatelessWidget {
         future: usersColRef.doc(email).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            var me = User.fromFirestore(snapshot.data!);
+            var me = RoomieUser.fromFirestore(snapshot.data!);
             return SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Container(

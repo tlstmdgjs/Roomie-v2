@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:social_app_ui/util/animations.dart';
@@ -11,6 +12,7 @@ import 'package:social_app_ui/views/screens/survey.dart';
 import 'package:social_app_ui/views/widgets/custom_button.dart';
 import 'package:social_app_ui/views/widgets/custom_text_field.dart';
 import 'package:social_app_ui/util/extensions.dart';
+import 'package:social_app_ui/util/api.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -30,8 +32,13 @@ class _LoginState extends State<Login> {
   final auth = Auth();
 
   login() async {
+    setState(() {
+      loading = true;
+    });
+
     FormState form = formKey.currentState!;
     form.save();
+
     if (!form.validate()) {
       validate = true;
       setState(() {});
@@ -50,7 +57,14 @@ class _LoginState extends State<Login> {
       }
       if (authMessage != 'verified')
         auth.showAuthDialog(context, authMessage);
-      else
+      else {
+        await APIs.getFirebaseMessagingToken();
+        await APIs.getSelfInfo();
+        print(APIs.me.pushToken);
+        if (APIs.me.pushToken.isNotEmpty) {
+          await createUserDocument(APIs.me.email, APIs.me.pushToken);
+        }
+
         switch (formMode) {
           case FormMode.REGISTER:
             Navigate.pushPageReplacement(
@@ -63,7 +77,22 @@ class _LoginState extends State<Login> {
             Navigate.pushPageReplacement(context, MainScreen(email: email));
             break;
         }
+      }
     }
+    setState(() {
+      loading = false;
+    });
+  }
+
+  Future<void> createUserDocument(String email, String pushToken) async {
+    final userRef = APIs.firestore.collection('users').doc(email);
+    final userData = {
+      'email': email,
+      'pushToken': pushToken,
+      // ... other user data fields ...
+    };
+    await userRef.set(userData, SetOptions(merge: true));
+    print('User document created or updated.');
   }
 
   @override

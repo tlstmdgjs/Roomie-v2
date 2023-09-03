@@ -30,7 +30,7 @@ class _SurveyState extends State<Survey> {
   String surveyMode = 'introduction';
   int surveyIndex = 0;
 
-  late User user;
+  late RoomieUser user;
   late String dropdownDormValue, dropdownStuNumValue, dropdownMajorValue;
 
   bool loading = false;
@@ -55,7 +55,7 @@ class _SurveyState extends State<Survey> {
   @override
   void initState() {
     super.initState();
-    user = User.init(widget.email);
+    user = RoomieUser.init(widget.email);
     usersColRef.doc(user.email).set(user.toFirestore());
     chatsColRef.doc(user.email).set({});
     dropdownDormValue = user.essentials['dormitory'];

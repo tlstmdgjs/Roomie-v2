@@ -12,7 +12,7 @@ List<ProfileCard> getDeck(
     deck.add(
       ProfileCard(
         email: myEmail,
-        user: User.fromFirestore(doc),
+        user: RoomieUser.fromFirestore(doc),
       ),
     );
   }

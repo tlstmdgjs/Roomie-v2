@@ -7,6 +7,7 @@ import 'package:social_app_ui/util/router.dart';
 import 'package:social_app_ui/util/user.dart';
 import 'package:social_app_ui/views/screens/other_profile.dart';
 import 'package:social_app_ui/views/widgets/chat_bubble.dart';
+import 'package:social_app_ui/util/api.dart';
 
 class Conversation extends StatefulWidget {
   final String email;
@@ -19,6 +20,8 @@ class Conversation extends StatefulWidget {
   @override
   _ConversationState createState() => _ConversationState();
 }
+
+RoomieUser? otheruser;
 
 class _ConversationState extends State<Conversation> {
   var controller = TextEditingController();
@@ -63,7 +66,7 @@ class _ConversationState extends State<Conversation> {
               ),
               onTap: () {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  User user = User.fromFirestore(snapshot.data!);
+                  RoomieUser user = RoomieUser.fromFirestore(snapshot.data!);
                   Navigate.pushPage(
                     context,
                     OtherProfile(user: user),
@@ -75,6 +78,75 @@ class _ConversationState extends State<Conversation> {
           },
         ),
         actions: <Widget>[
+          Container(
+            margin: EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text(""),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("룸메이트를 신청하시겠습니까?"),
+                        ],
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.white,
+                          ),
+                          child: Text("신청"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            DocumentSnapshot<Map<String, dynamic>>
+                                userSnapshot = await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc('sshny1029@jbnu.ac.kr')
+                                    .get();
+                            if (userSnapshot.exists) {
+                              String otherUserEmail =
+                                  userSnapshot.data()!['email'];
+                              String otherUserToken =
+                                  userSnapshot.data()!['pushToken'];
+                              otheruser = RoomieUser(
+                                email: otherUserEmail,
+                                essentials: RoomieUser.essentialInitialize(),
+                                survey: RoomieUser.answerInitialize(),
+                                pushToken: otherUserToken,
+                              );
+                            }
+                            Future.delayed(Duration(milliseconds: 100), () {
+                              APIs.sendPushNotification(otheruser!, "확인해주세요");
+                              print(otheruser!.pushToken);
+                            });
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.white,
+                          ),
+                          child: Text("취소"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.yellow,
+              ),
+              child: Text("신청"),
+            ),
+          ),
           IconButton(
             icon: Icon(
               Icons.more_horiz,
@@ -88,7 +160,8 @@ class _ConversationState extends State<Conversation> {
         builder: (context, snapshot) {
           var chat = widget.chat;
           if (snapshot.hasData) {
-            var conversations = snapshot.data!.data()![widget.chat.email] ?? [];
+            var conversations =
+                (snapshot.data!.data()?[widget.chat.email] ?? []) as List;
             chat = Chat(
               email: chat.email,
               nickname: chat.nickname,

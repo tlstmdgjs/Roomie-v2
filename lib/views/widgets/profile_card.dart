@@ -11,7 +11,7 @@ import 'package:social_app_ui/views/widgets/inprofile_button.dart';
 
 class ProfileCard extends StatelessWidget {
   final String email;
-  final User user;
+  final RoomieUser user;
   final Owner profileMode;
   final List<String> highest, lowest;
   ProfileCard({
@@ -190,7 +190,56 @@ class ProfileCard extends StatelessWidget {
                           ),
                         );
                       },
-                    )
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text(""),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text("룸메이트를 신청하시겠습니까?"),
+                                  ],
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // 여기에 룸메이트 신청 로직을 추가할 수 있음
+                                      Navigator.pop(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.black,
+                                      backgroundColor: Colors.white,
+                                    ),
+                                    child: Text("신청"),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.black,
+                                      backgroundColor: Colors.white,
+                                    ),
+                                    child: Text("취소"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.black,
+                          backgroundColor: Colors.yellow,
+                        ),
+                        child: Text("신청"),
+                      ),
+                    ),
                   ],
                 ),
               ),

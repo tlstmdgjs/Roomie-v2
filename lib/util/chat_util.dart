@@ -30,12 +30,13 @@ class Chat {
 List<Chat> getChatsFromSnapshot(
     AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
   List<Chat> chats = [];
-  if (snapshot.hasData) {
+  if (snapshot.hasData && snapshot.data!.exists) {
     var chatsFromFirestore = snapshot.data!.data() as Map<String, dynamic>;
     chatsFromFirestore.forEach(
       (key, value) {
         var conversations = value;
         var nickname = conversations.last['nickname'];
+        var pushToken = conversations.last['pushToken'];
         chats.add(
           Chat(
             conversations: conversations,
