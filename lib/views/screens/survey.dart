@@ -38,7 +38,7 @@ class _SurveyState extends State<Survey> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   nextStep() async {
-    if (surveyIndex == surveyList.length) {
+    if (surveyIndex >= surveyList.length) {
       Navigate.pushPageReplacement(context, MainScreen(email: user.email));
     }
     FormState form = formKey.currentState!;

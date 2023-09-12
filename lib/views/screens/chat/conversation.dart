@@ -124,7 +124,8 @@ class _ConversationState extends State<Conversation> {
                               );
                             }
                             Future.delayed(Duration(milliseconds: 100), () {
-                              APIs.sendPushNotification(otheruser!, "확인해주세요");
+                              APIs.sendPushNotification(
+                                  otheruser!, "알림", "룸메이트 신청이 도착했습니다!");
                               print(otheruser!.pushToken);
                             });
                             Navigator.pop(context);
@@ -235,7 +236,7 @@ class _ConversationState extends State<Conversation> {
                                 icon: Icon(
                                   Icons.send,
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   var typedToFirestore = chat.typedToFirestore(
                                       widget.email,
                                       controller.text,
@@ -252,6 +253,30 @@ class _ConversationState extends State<Conversation> {
                                     FieldPath([widget.email]):
                                         FieldValue.arrayUnion(typedToFirestore)
                                   });
+
+                                  DocumentSnapshot<Map<String, dynamic>>
+                                      userSnapshot = await FirebaseFirestore
+                                          .instance
+                                          .collection('users')
+                                          .doc('${chat.email}')
+                                          .get();
+                                  if (userSnapshot.exists) {
+                                    String otherUserEmail =
+                                        userSnapshot.data()!['email'];
+                                    String otherUserToken =
+                                        userSnapshot.data()!['pushToken'];
+                                    otheruser = RoomieUser(
+                                      email: otherUserEmail,
+                                      essentials:
+                                          RoomieUser.essentialInitialize(),
+                                      survey: RoomieUser.answerInitialize(),
+                                      pushToken: otherUserToken,
+                                    );
+                                    APIs.sendPushNotification(otheruser!,
+                                        "${chat.nickname}", controller.text);
+                                    print(otheruser!.pushToken);
+                                  }
+
                                   controller.text = '';
                                   mounted ? setState(() {}) : dispose();
                                 },

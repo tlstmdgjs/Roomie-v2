@@ -61,7 +61,7 @@ class _LoginState extends State<Login> {
         await APIs.getFirebaseMessagingToken();
         await APIs.getSelfInfo();
         print(APIs.me.pushToken);
-        if (APIs.me.pushToken.isNotEmpty) {
+        if (APIs.me.pushToken!.isNotEmpty) {
           await createUserDocument(APIs.me.email, APIs.me.pushToken);
         }
 
@@ -74,6 +74,13 @@ class _LoginState extends State<Login> {
             break;
           case FormMode.LOGIN:
           case FormMode.FORGOT_PASSWORD:
+            final userRef = APIs.firestore.collection('users').doc(email);
+            final userData = {
+              'email': email,
+              'pushToken': APIs.me.pushToken,
+              // ... other user data fields ...
+            };
+            await userRef.update(userData);
             Navigate.pushPageReplacement(context, MainScreen(email: email));
             break;
         }
@@ -84,7 +91,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Future<void> createUserDocument(String email, String pushToken) async {
+  Future<void> createUserDocument(String email, String? pushToken) async {
     final userRef = APIs.firestore.collection('users').doc(email);
     final userData = {
       'email': email,

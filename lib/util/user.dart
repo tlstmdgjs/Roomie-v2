@@ -10,7 +10,7 @@ class RoomieUser {
   String email;
   int tag;
   Map<String, dynamic> essentials, survey;
-  late String pushToken;
+  String? pushToken;
 
   RoomieUser({
     required this.email,

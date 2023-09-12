@@ -46,11 +46,11 @@ class APIs {
 
   //for sending push notification
   static Future<void> sendPushNotification(
-      RoomieUser roomieUser, String msg) async {
+      RoomieUser roomieUser, String title, String msg) async {
     try {
       final body = {
         "to": roomieUser.pushToken,
-        "notification": {"title": "알림", "body": "룸메이트 신청이 도착했습니다!"}
+        "notification": {"title": "$title", "body": "$msg"}
       };
       var res = await post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
           headers: {
