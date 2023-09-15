@@ -61,7 +61,7 @@ class _LoginState extends State<Login> {
         await APIs.getFirebaseMessagingToken();
         await APIs.getSelfInfo();
         print(APIs.me.pushToken);
-        if (APIs.me.pushToken.isNotEmpty) {
+        if (APIs.me.pushToken!.isNotEmpty) {
           await createUserDocument(APIs.me.email, APIs.me.pushToken);
         }
 
@@ -84,7 +84,7 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Future<void> createUserDocument(String email, String pushToken) async {
+  Future<void> createUserDocument(String email, String? pushToken) async {
     final userRef = APIs.firestore.collection('users').doc(email);
     final userData = {
       'email': email,

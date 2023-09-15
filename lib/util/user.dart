@@ -10,7 +10,7 @@ class RoomieUser {
   String email;
   int tag;
   Map<String, dynamic> essentials, survey;
-  late String pushToken;
+  String? pushToken;
 
   RoomieUser({
     required this.email,
@@ -69,11 +69,11 @@ class RoomieUser {
 
   factory RoomieUser.fromFirestore(DocumentSnapshot snapshot) {
     var fromFirestore = snapshot.data() as Map<String, dynamic>;
-
     String email = snapshot.id;
     int tag = fromFirestore['tag'] ?? 0;
 
     Map<String, dynamic> essentials = {}, survey = {};
+
     for (var essential in essentialList) {
       essentials[essential] = fromFirestore[essential];
     }

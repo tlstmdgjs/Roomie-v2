@@ -25,6 +25,24 @@ RoomieUser? otheruser;
 
 class _ConversationState extends State<Conversation> {
   var controller = TextEditingController();
+
+  void sendMatchingRequest(String senderEmail, String receiverEmail) async {
+    try {
+      CollectionReference matchingColRef =
+          FirebaseFirestore.instance.collection('matching');
+
+      Map<String, dynamic> request = {
+        'senderEmail': senderEmail,
+        'receiverEmail': receiverEmail,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      await matchingColRef.add(request);
+    } catch (e) {
+      print('Error sending matching request: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var chatDocRef = chatsColRef.doc(widget.email);
@@ -96,20 +114,16 @@ class _ConversationState extends State<Conversation> {
                       actions: [
                         ElevatedButton(
                           onPressed: () async {
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.black,
-                            backgroundColor: Colors.white,
-                          ),
-                          child: Text("신청"),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
+                            print("신청");
+
+                            String receiverEmail = 'tmdgjs@jbnu.ac.kr';
+
+                            sendMatchingRequest(widget.email, receiverEmail);
+
                             DocumentSnapshot<Map<String, dynamic>>
                                 userSnapshot = await FirebaseFirestore.instance
                                     .collection('users')
-                                    .doc('sshny1029@jbnu.ac.kr')
+                                    .doc('tmdgjs@jbnu.ac.kr')
                                     .get();
                             if (userSnapshot.exists) {
                               String otherUserEmail =
@@ -124,9 +138,19 @@ class _ConversationState extends State<Conversation> {
                               );
                             }
                             Future.delayed(Duration(milliseconds: 100), () {
-                              APIs.sendPushNotification(otheruser!, "확인해주세요");
+                              APIs.sendPushNotification(otheruser!);
                               print(otheruser!.pushToken);
                             });
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.white,
+                          ),
+                          child: Text("신청"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(

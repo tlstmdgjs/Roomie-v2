@@ -11,7 +11,7 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Notifications",
+          "Setting",
         ),
         centerTitle: true,
         actions: <Widget>[

@@ -39,19 +39,22 @@ class APIs {
         log('Push Token: $t');
         print(t);
 
-        print("FCM Token: $t");
+        me.setPushToken(t);
       }
     });
   }
 
   //for sending push notification
-  static Future<void> sendPushNotification(
-      RoomieUser roomieUser, String msg) async {
+  static Future<void> sendPushNotification(RoomieUser roomieUser) async {
     try {
       final body = {
         "to": roomieUser.pushToken,
-        "notification": {"title": "알림", "body": "룸메이트 신청이 도착했습니다!"}
+        "notification": {
+          "title": RoomieUser.essentialInitialize()['nickname'],
+          "body": "룸메이트 신청이 도착했습니다!"
+        }
       };
+
       var res = await post(Uri.parse("https://fcm.googleapis.com/fcm/send"),
           headers: {
             HttpHeaders.contentTypeHeader: 'application/json',
