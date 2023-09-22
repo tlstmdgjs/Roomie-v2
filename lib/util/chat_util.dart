@@ -36,7 +36,6 @@ List<Chat> getChatsFromSnapshot(
       (key, value) {
         var conversations = value;
         var nickname = conversations.last['nickname'];
-        var pushToken = conversations.last['pushToken'];
         chats.add(
           Chat(
             conversations: conversations,

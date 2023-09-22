@@ -89,7 +89,6 @@ class _LoginState extends State<Login> {
     final userData = {
       'email': email,
       'pushToken': pushToken,
-      // ... other user data fields ...
     };
     await userRef.set(userData, SetOptions(merge: true));
     print('User document created or updated.');

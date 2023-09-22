@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_ui/util/chat_util.dart';
@@ -138,7 +140,8 @@ class _ConversationState extends State<Conversation> {
                               );
                             }
                             Future.delayed(Duration(milliseconds: 100), () {
-                              APIs.sendPushNotification(otheruser!);
+                              APIs.sendPushNotification(
+                                  otheruser!, "알림", "룸메이트 신청이 도착했습니다!");
                               print(otheruser!.pushToken);
                             });
                             Navigator.pop(context);
@@ -259,7 +262,7 @@ class _ConversationState extends State<Conversation> {
                                 icon: Icon(
                                   Icons.send,
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   var typedToFirestore = chat.typedToFirestore(
                                       widget.email,
                                       controller.text,
@@ -276,6 +279,35 @@ class _ConversationState extends State<Conversation> {
                                     FieldPath([widget.email]):
                                         FieldValue.arrayUnion(typedToFirestore)
                                   });
+
+                                  DocumentSnapshot<Map<String, dynamic>>
+                                      userSnapshot = await FirebaseFirestore
+                                          .instance
+                                          .collection('users')
+                                          .doc('${chat.email}')
+                                          .get();
+
+                                  if (userSnapshot.exists) {
+                                    String? otherUserEmail =
+                                        userSnapshot.data()?['email'];
+                                    if (otherUserEmail != null) {
+                                      String otherUserToken =
+                                          userSnapshot.data()!['pushToken'];
+                                      otheruser = RoomieUser(
+                                        email: otherUserEmail,
+                                        essentials:
+                                            RoomieUser.essentialInitialize(),
+                                        survey: RoomieUser.answerInitialize(),
+                                        pushToken: otherUserToken,
+                                      );
+                                      APIs.sendPushNotification(otheruser!,
+                                          "${chat.nickname}", controller.text);
+                                      print(otheruser!.pushToken);
+                                      log("$controller.text");
+                                    } else {
+                                      print("email 존재하지 않음");
+                                    }
+                                  }
                                   controller.text = '';
                                   mounted ? setState(() {}) : dispose();
                                 },

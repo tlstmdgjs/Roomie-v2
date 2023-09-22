@@ -209,7 +209,6 @@ class ProfileCard extends StatelessWidget {
                                 actions: [
                                   ElevatedButton(
                                     onPressed: () {
-                                      // 여기에 룸메이트 신청 로직을 추가할 수 있음
                                       Navigator.pop(context);
                                     },
                                     style: ElevatedButton.styleFrom(
