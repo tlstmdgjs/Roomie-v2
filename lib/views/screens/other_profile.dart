@@ -5,7 +5,6 @@ import 'package:social_app_ui/views/screens/detail.dart';
 class OtherProfile extends StatelessWidget {
   final RoomieUser user;
   OtherProfile({
-    super.key,
     required this.user,
   });
 

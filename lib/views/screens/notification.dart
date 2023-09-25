@@ -84,6 +84,19 @@ class _NotiState extends State<Noti> {
     }
   }
 
+  Future<RoomieUser> getRoomieUser(String email) async {
+    try {
+      DocumentSnapshot docSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(email).get();
+      if (docSnapshot.exists) {
+        return RoomieUser.fromFirestore(docSnapshot);
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+    return RoomieUser.init(email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +135,7 @@ class _NotiState extends State<Noti> {
                       onTap: () async {
                         print('onTap');
                         RoomieUser senderUser =
-                            await getUserFromFirestore(senderEmail);
+                            await getRoomieUser(senderEmail);
                         print(senderUser.essentials['studentNumber']);
                         Navigate.pushPage(
                             context, OtherProfile(user: senderUser));
