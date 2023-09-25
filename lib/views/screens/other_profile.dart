@@ -11,6 +11,8 @@ class OtherProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(user.email);
+    print(user.essentials['studentNumber']);
     return Scaffold(
       appBar: AppBar(
         title: Text(

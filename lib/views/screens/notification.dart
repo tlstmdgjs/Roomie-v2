@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_app_ui/util/router.dart';
 import 'package:social_app_ui/util/user.dart';
 import 'other_profile.dart';
 import 'package:social_app_ui/util/api.dart';
@@ -34,6 +35,7 @@ class _NotiState extends State<Noti> {
       if (docSnapshot.exists) {
         Map<String, dynamic> userData =
             docSnapshot.data() as Map<String, dynamic>;
+        print(userData);
         Map<String, dynamic> essentials =
             userData['essentials'] ?? RoomieUser.essentialInitialize();
         Map<String, dynamic> survey =
@@ -54,29 +56,29 @@ class _NotiState extends State<Noti> {
   }
 
   Future<void> updateConnectedField(
-      String otherUserEmail, int connectedValue) async {
+      String otherUserEmail, String myEmail) async {
     try {
       DocumentReference otherUserDocRef =
           FirebaseFirestore.instance.collection('users').doc(otherUserEmail);
 
-      Map<String, dynamic> updateData = {'connected': connectedValue};
+      DocumentReference myDocRef =
+          FirebaseFirestore.instance.collection('users').doc(myEmail);
+
+      Map<String, dynamic> updateDataOtherUser = {'connected': myEmail};
 
       await FirebaseFirestore.instance.runTransaction((Transaction) async {
-        await Transaction.update(otherUserDocRef, updateData);
+        await Transaction.update(otherUserDocRef, updateDataOtherUser);
       });
 
-      print('상대방의 connected 필드가 업데이트되었습니다. 값: $connectedValue');
+      print('상대방의 connected 필드가 업데이트되었습니다. 값: $myEmail');
 
-      if (connectedValue == 1) {
-        DocumentReference myDocRef =
-            FirebaseFirestore.instance.collection('users').doc(widget.email);
+      Map<String, dynamic> updateDataMyUser = {'connected': otherUserEmail};
 
-        await FirebaseFirestore.instance.runTransaction((Transaction) async {
-          await Transaction.update(myDocRef, updateData);
-        });
+      await FirebaseFirestore.instance.runTransaction((Transaction) async {
+        await Transaction.update(myDocRef, updateDataMyUser);
+      });
 
-        print('내 connected 필드도 업데이트되었습니다. 값: $connectedValue');
-      }
+      print('내 connected 필드도 업데이트되었습니다. 값: $otherUserEmail');
     } catch (e) {
       print('connected 필드 업데이트 오류: $e');
     }
@@ -118,16 +120,20 @@ class _NotiState extends State<Noti> {
                         "${dateTime.year}-${dateTime.month}-${dateTime.day} ${dateTime.hour}:${dateTime.minute}:${dateTime.second}";
                     return GestureDetector(
                       onTap: () async {
+                        print('onTap');
                         RoomieUser senderUser =
                             await getUserFromFirestore(senderEmail);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OtherProfile(
-                              user: senderUser,
-                            ),
-                          ),
-                        );
+                        print(senderUser.essentials['studentNumber']);
+                        Navigate.pushPage(
+                            context, OtherProfile(user: senderUser));
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => OtherProfile(
+                        //       user: senderUser,
+                        //     ),
+                        //   ),
+                        // );
                       },
                       child: ListTile(
                         title: Text(
@@ -150,8 +156,10 @@ class _NotiState extends State<Noti> {
                               onPressed: () async {
                                 RoomieUser senderUser =
                                     await getUserFromFirestore(senderEmail);
-                                updateConnectedField(senderEmail, 1);
+                                updateConnectedField(senderEmail, widget.email);
                                 final pushToken = senderUser.pushToken;
+
+                                print('onPressed');
 
                                 await APIs.sendMatchNotification(
                                   pushToken ?? 'defaultPushToken',
@@ -179,7 +187,7 @@ class _NotiState extends State<Noti> {
                               onPressed: () async {
                                 RoomieUser senderUser =
                                     await getUserFromFirestore(senderEmail);
-                                updateConnectedField(senderEmail, 0);
+                                updateConnectedField(senderEmail, 'null');
                                 final pushToken = senderUser.pushToken;
 
                                 if (acceptanceStatus[senderEmail] != true) {
@@ -187,15 +195,15 @@ class _NotiState extends State<Noti> {
                                     pushToken ?? 'defaultPushToken',
                                     '룸메이트 신청이 거절 되었습니다.',
                                   );
+                                  await FirebaseFirestore.instance
+                                      .collection('matching')
+                                      .doc(requestSnapshot.id)
+                                      .delete();
                                 } else {
                                   await APIs.sendCancelNotification(
                                       pushToken ?? 'defaultPushToken',
                                       '룸메이트 취소가 요청되었습니다.');
                                 }
-                                await FirebaseFirestore.instance
-                                    .collection('matching')
-                                    .doc(requestSnapshot.id)
-                                    .delete();
 
                                 setState(() {
                                   acceptanceStatus[senderEmail] = false;
