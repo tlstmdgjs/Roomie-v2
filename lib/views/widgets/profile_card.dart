@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_ui/util/chat_util.dart';
 import 'package:social_app_ui/util/configs/list_config.dart';
@@ -8,6 +9,7 @@ import 'package:social_app_ui/util/user.dart';
 import 'package:social_app_ui/views/screens/chat/conversation.dart';
 import 'package:social_app_ui/views/screens/other_profile.dart';
 import 'package:social_app_ui/views/widgets/inprofile_button.dart';
+import 'package:social_app_ui/util/api.dart';
 
 class ProfileCard extends StatelessWidget {
   final String email;
@@ -22,6 +24,24 @@ class ProfileCard extends StatelessWidget {
     this.highest = const [],
     this.lowest = const [],
   });
+
+  Future<void> sendMatchingRequest(
+      String senderEmail, String receiverEmail) async {
+    try {
+      CollectionReference matchingColRef =
+          FirebaseFirestore.instance.collection('matching');
+
+      Map<String, dynamic> request = {
+        'senderEmail': senderEmail,
+        'receiverEmail': receiverEmail,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+
+      await matchingColRef.add(request);
+    } catch (e) {
+      print('Error sending matching request: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +228,38 @@ class ProfileCard extends StatelessWidget {
                                 ),
                                 actions: [
                                   ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async {
+                                      print("신청");
+
+                                      String receiverEmail = email;
+
+                                      sendMatchingRequest(email, receiverEmail);
+
+                                      DocumentSnapshot<Map<String, dynamic>>
+                                          userSnapshot = await FirebaseFirestore
+                                              .instance
+                                              .collection('users')
+                                              .doc(receiverEmail)
+                                              .get();
+                                      if (userSnapshot.exists) {
+                                        String otherUserEmail =
+                                            userSnapshot.data()!['email'];
+                                        String otherUserToken =
+                                            userSnapshot.data()!['pushToken'];
+                                        otheruser = RoomieUser(
+                                          email: otherUserEmail,
+                                          essentials:
+                                              RoomieUser.essentialInitialize(),
+                                          survey: RoomieUser.answerInitialize(),
+                                          pushToken: otherUserToken,
+                                        );
+                                      }
+                                      Future.delayed(
+                                          Duration(milliseconds: 100), () {
+                                        APIs.sendPushNotification(otheruser!,
+                                            "알림", "룸메이트 신청이 도착했습니다!");
+                                        print(otheruser!.pushToken);
+                                      });
                                       Navigator.pop(context);
                                     },
                                     style: ElevatedButton.styleFrom(
