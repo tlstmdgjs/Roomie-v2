@@ -4,7 +4,6 @@ import 'package:social_app_ui/views/screens/home.dart';
 
 import 'package:social_app_ui/views/screens/my_profile.dart';
 import 'package:social_app_ui/views/screens/settings.dart';
-import 'package:social_app_ui/views/screens/notification.dart';
 
 class MainScreen extends StatefulWidget {
   late final String email;
@@ -31,7 +30,6 @@ class _MainScreenState extends State<MainScreen> {
           Home(email: widget.email),
           MyProfile(email: widget.email),
           Chats(email: widget.email),
-          Noti(email: widget.email),
           Settings(),
         ],
       ),
@@ -55,12 +53,6 @@ class _MainScreenState extends State<MainScreen> {
               Icons.message,
             ),
             label: '채팅',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.favorite,
-            ),
-            label: '알림',
           ),
           BottomNavigationBarItem(
             icon: Icon(

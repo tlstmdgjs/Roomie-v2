@@ -28,23 +28,6 @@ RoomieUser? otheruser;
 class _ConversationState extends State<Conversation> {
   var controller = TextEditingController();
 
-  void sendMatchingRequest(String senderEmail, String receiverEmail) async {
-    try {
-      CollectionReference matchingColRef =
-          FirebaseFirestore.instance.collection('matching');
-
-      Map<String, dynamic> request = {
-        'senderEmail': senderEmail,
-        'receiverEmail': receiverEmail,
-        'timestamp': FieldValue.serverTimestamp(),
-      };
-
-      await matchingColRef.add(request);
-    } catch (e) {
-      print('Error sending matching request: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var chatDocRef = chatsColRef.doc(widget.email);
@@ -98,82 +81,6 @@ class _ConversationState extends State<Conversation> {
           },
         ),
         actions: <Widget>[
-          Container(
-            margin: EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text(""),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("룸메이트를 신청하시겠습니까?"),
-                        ],
-                      ),
-                      actions: [
-                        ElevatedButton(
-                          onPressed: () async {
-                            print("신청");
-
-                            String receiverEmail = 'tmdgjs@jbnu.ac.kr';
-
-                            sendMatchingRequest(widget.email, receiverEmail);
-
-                            DocumentSnapshot<Map<String, dynamic>>
-                                userSnapshot = await FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc('tmdgjs@jbnu.ac.kr')
-                                    .get();
-                            if (userSnapshot.exists) {
-                              String otherUserEmail =
-                                  userSnapshot.data()!['email'];
-                              String otherUserToken =
-                                  userSnapshot.data()!['pushToken'];
-                              otheruser = RoomieUser(
-                                email: otherUserEmail,
-                                essentials: RoomieUser.essentialInitialize(),
-                                survey: RoomieUser.answerInitialize(),
-                                pushToken: otherUserToken,
-                              );
-                            }
-                            Future.delayed(Duration(milliseconds: 100), () {
-                              APIs.sendPushNotification(
-                                  otheruser!, "알림", "룸메이트 신청이 도착했습니다!");
-                              print(otheruser!.pushToken);
-                            });
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.black,
-                            backgroundColor: Colors.white,
-                          ),
-                          child: Text("신청"),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.black,
-                            backgroundColor: Colors.white,
-                          ),
-                          child: Text("취소"),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.yellow,
-              ),
-              child: Text("신청"),
-            ),
-          ),
           IconButton(
             icon: Icon(
               Icons.more_horiz,

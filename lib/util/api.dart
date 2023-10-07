@@ -67,54 +67,6 @@ class APIs {
     }
   }
 
-  static Future<void> sendMatchNotification(
-      String token, String message) async {
-    try {
-      final body = {
-        "to": token,
-        "notification": {"title": "알림", "body": message}
-      };
-
-      var res = await post(
-        Uri.parse("https://fcm.googleapis.com/fcm/send"),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.authorizationHeader:
-              'key=AAAAlTydX30:APA91bH5vYC6SJ39hlw57MAWQZXqrS58UH3TLi2yYJw4qwR-K-ipCyeHoqbM6n5f78jkU1u_iC22ewYTvGsnGVXQY-ekYMCN5whKjyD9JZY1uLMSaCXatxfw8nuJ3MpmPAFFPnH5T2Db',
-        },
-        body: jsonEncode(body),
-      );
-      log('Response status: ${res.statusCode}');
-      log('Response body: ${res.body}');
-    } catch (e) {
-      log('\nsendMatchNotification Error: $e');
-    }
-  }
-
-  static Future<void> sendCancelNotification(
-      String token, String message) async {
-    try {
-      final body = {
-        "to": token,
-        "notification": {"title": "알림", "body": message}
-      };
-
-      var res = await post(
-        Uri.parse("https://fcm.googleapis.com/fcm/send"),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.authorizationHeader:
-              'key=AAAAlTydX30:APA91bH5vYC6SJ39hlw57MAWQZXqrS58UH3TLi2yYJw4qwR-K-ipCyeHoqbM6n5f78jkU1u_iC22ewYTvGsnGVXQY-ekYMCN5whKjyD9JZY1uLMSaCXatxfw8nuJ3MpmPAFFPnH5T2Db',
-        },
-        body: jsonEncode(body),
-      );
-      log('Response status: ${res.statusCode}');
-      log('Response body: ${res.body}');
-    } catch (e) {
-      log('\nsendMatchNotification Error: $e');
-    }
-  }
-
   //for checking if user exists or not?
   Future<bool> userExists() async {
     return (await firestore
