@@ -11,6 +11,7 @@ class RoomieUser {
   int tag;
   Map<String, dynamic> essentials, survey;
   String? pushToken;
+  int status;
 
   RoomieUser({
     required this.email,
@@ -18,6 +19,7 @@ class RoomieUser {
     required this.essentials,
     required this.survey,
     String pushToken = '',
+    this.status = 0,
   }) : pushToken = pushToken;
 
   void setPushToken(String token) {
@@ -27,6 +29,7 @@ class RoomieUser {
   RoomieUser.init(String email)
       : this.email = email,
         tag = 0,
+        status = 0,
         essentials = essentialInitialize(),
         survey = answerInitialize();
 
@@ -71,6 +74,7 @@ class RoomieUser {
     var fromFirestore = snapshot.data() as Map<String, dynamic>;
     String email = snapshot.id;
     int tag = fromFirestore['tag'] ?? 0;
+    int status = fromFirestore['status'] ?? 0;
 
     Map<String, dynamic> essentials = {}, survey = {};
 
@@ -89,6 +93,7 @@ class RoomieUser {
       essentials: essentials,
       survey: survey,
       pushToken: pushToken,
+      status: status,
     );
   }
 
@@ -98,6 +103,7 @@ class RoomieUser {
     toFirestore.addAll(essentials);
     toFirestore.addAll(survey);
     toFirestore['pushToken'] = pushToken;
+    toFirestore['status'] = status;
 
     return toFirestore;
   }
